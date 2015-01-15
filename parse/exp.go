@@ -99,7 +99,7 @@ type VarExp struct {
 	Name string
 }
 
-func (e *VarExp) Eval() interface{} {
+func (e VarExp) Eval() interface{} {
 	return nil
 }
 
@@ -108,6 +108,6 @@ type FuncExp struct {
 	Params []exp
 }
 
-func (e *FuncExp) Eval() interface{} {
+func (e FuncExp) Eval() interface{} {
 	return nil
 }
