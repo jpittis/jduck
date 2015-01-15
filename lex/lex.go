@@ -66,33 +66,24 @@ func New(reader io.Reader) *Lexer {
 }
 
 // Peek returns the last read token.
-func (l *Lexer) Peek() (*Token, error) {
+func (l *Lexer) Peek() *Token { // TODO handle errors
 	if l.token == nil {
-		t, err := l.lex()
-		if err != nil {
-			return nil, err
-		}
+		t, _ := l.lex()
 		l.token = t
 	}
-	return l.token, nil
+	return l.token
 }
 
 // Eat returns the last read token while reading another.
-func (l *Lexer) Eat() (*Token, error) {
+func (l *Lexer) Eat() *Token { // TODO handle errors
 	if l.token == nil {
-		t, err := l.lex()
-		if err != nil {
-			return nil, err
-		}
+		t, _ := l.lex()
 		l.token = t
 	}
 	temp := l.token
-	t, err := l.lex()
-	if err != nil {
-		return nil, err
-	}
+	t, _ := l.lex()
 	l.token = t
-	return temp, nil
+	return temp
 }
 
 func (l *Lexer) read() (rune, error) {

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/jpittis/jduck/lex"
+	"github.com/jpittis/jduck/parse"
 	"log"
 	"os"
 )
@@ -13,12 +14,5 @@ func main() {
 		log.Fatal(err)
 	}
 	l := lex.New(f)
-	t, err := l.Eat()
-	for t.T != lex.EOF {
-		t, err = l.Eat()
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Println(t)
-	}
+	fmt.Println(parse.Parse(st))
 }

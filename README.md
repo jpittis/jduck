@@ -8,4 +8,7 @@ A language built in the iconic basement lounge of Queen's Campus.
     3. + - / % *
     4. ( )
     5. true false
-    5. > < <= >= and or
+    6. > < <= >= and or
+
+* Parsing Rules
+    1. * / % + -

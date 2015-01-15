@@ -1,9 +1,9 @@
 package parse
 
-type BinaryType int
+type BinType int
 
 const (
-	Add BinaryType = iota
+	Add BinType = iota
 	Sub
 	Mul
 	Div
@@ -27,22 +27,22 @@ const (
 )
 
 type exp interface {
-	Eval() Literal
+	Eval() interface{}
 }
 
-type LiteralExp struct {
+type LitExp struct {
 	value interface{}
 }
 
-type BinaryExp struct {
-	Operator BinaryType
-	Left     exp
-	Right    exp
+type BinExp struct {
+	Op    BinType
+	Left  *exp
+	Right *exp
 }
 
-type UnaryExp struct {
+type UnaExp struct {
 	Operator UnaryType
-	Right    exp
+	Right    *exp
 }
 
 type VarExp struct {
@@ -51,5 +51,5 @@ type VarExp struct {
 
 type FuncExp struct {
 	Name   string
-	Params []exp
+	Params []*exp
 }
