@@ -15,7 +15,7 @@ const (
 	String TokenType = iota
 	Integer
 
-	Let
+	Print
 	Func
 
 	Ident
@@ -252,8 +252,8 @@ func lookup(ident string) *Token {
 		return &Token{T: And}
 	case "or":
 		return &Token{T: Or}
-	case "let":
-		return &Token{T: Let}
+	case "print":
+		return &Token{T: Print}
 	case "func":
 		return &Token{T: Func}
 	default:

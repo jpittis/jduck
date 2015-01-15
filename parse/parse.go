@@ -5,8 +5,29 @@ import (
 	"github.com/jpittis/jduck/lex"
 )
 
-func Parse(st *lex.Lexer) exp {
-	return parse_exp(st)
+func Parse(st *lex.Lexer) []stmt {
+	s := make([]stmt, 0)
+	for st.Peek().T != lex.EOF {
+		switch st.Peek().T {
+		case lex.Ident:
+			st.Eat()
+			s = append(s, parse_ident(st))
+		case lex.Print:
+			st.Eat()
+			s = append(s, parse_print(st))
+		default:
+			fmt.Println("statement type not found")
+		}
+	}
+	return s
+}
+
+func parse_ident(st *lex.Lexer) stmt {
+	return nil
+}
+
+func parse_print(st *lex.Lexer) stmt {
+	return nil
 }
 
 func parse_exp(st *lex.Lexer) exp {
