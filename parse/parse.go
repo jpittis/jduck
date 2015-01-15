@@ -28,7 +28,7 @@ func parse_pm(st *lex.Lexer) exp {
 }
 
 func parse_md(st *lex.Lexer) exp {
-	left := parse_lit(st)
+	left := parse_um(st)
 	switch st.Peek().T {
 	case lex.Mul:
 		st.Eat()
@@ -36,6 +36,20 @@ func parse_md(st *lex.Lexer) exp {
 	case lex.Div:
 		st.Eat()
 		return exp(BinExp{Op: Div, Left: left, Right: parse_md(st)})
+	case lex.Mod:
+		st.Eat()
+		return exp(BinExp{Op: Mod, Left: left, Right: parse_md(st)})
+	default:
+		return left
+	}
+}
+
+func parse_um(st *lex.Lexer) exp {
+	left := parse_lit(st)
+	switch st.Peek().T {
+	case lex.Sub:
+		st.Eat()
+		return exp(UnaExp{Op: Neg, Right: parse_um(st)})
 	default:
 		return left
 	}
@@ -50,7 +64,7 @@ func parse_lit(st *lex.Lexer) exp {
 		tok := st.Eat()
 		return exp(LitExp{value: tok.Value})
 	default:
-		fmt.Println("BAM!")
+		fmt.Println("Unknown Literal Reached")
 		return exp(LitExp{value: nil})
 	}
 }

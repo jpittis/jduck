@@ -46,14 +46,23 @@ func (b BinType) String() string {
 	}
 }
 
-type UnaryType int
+type UnaType int
 
 const (
-	Not UnaryType = iota
+	Not UnaType = iota
 	Neg
-	AddAdd
-	SubSub
 )
+
+func (u UnaType) String() string {
+	switch u {
+	case Not:
+		return "!"
+	case Neg:
+		return "-"
+	default:
+		return "error"
+	}
+}
 
 type exp interface {
 	Eval() interface{}
@@ -78,11 +87,11 @@ func (e BinExp) Eval() interface{} {
 }
 
 type UnaExp struct {
-	Operator UnaryType
-	Right    exp
+	Op    UnaType
+	Right exp
 }
 
-func (e *UnaExp) Eval() interface{} {
+func (e UnaExp) Eval() interface{} {
 	return nil
 }
 
