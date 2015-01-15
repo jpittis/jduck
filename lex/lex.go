@@ -15,8 +15,12 @@ const (
 	String TokenType = iota
 	Integer
 
+	Let
+	Func
+
 	Ident
 
+	EOL
 	EOF
 
 	Eq
@@ -97,8 +101,7 @@ func (l *Lexer) read() (rune, error) {
 }
 
 func (l *Lexer) unread() {
-	// error not handled because only ReadRune() used
-	l.reader.UnreadRune()
+	l.reader.UnreadRune() // error not handled only ReadRune() used
 }
 
 func (l *Lexer) lex() (*Token, error) {
@@ -124,6 +127,8 @@ func (l *Lexer) lex() (*Token, error) {
 		return &Token{T: LParen}, nil
 	case r == ')':
 		return &Token{T: RParen}, nil
+	case r == ';':
+		return &Token{T: EOL}, nil
 	case r == '!':
 		r, err = l.read()
 		if err != nil {
@@ -256,6 +261,10 @@ func lookup(ident string) *Token {
 		return &Token{T: And}
 	case "or":
 		return &Token{T: Or}
+	case "let":
+		return &Token{T: Let}
+	case "func":
+		return &Token{T: Func}
 	default:
 		return &Token{T: Ident, Value: ident}
 	}
