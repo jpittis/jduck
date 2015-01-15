@@ -16,6 +16,7 @@ func parse_exp(st *lex.Lexer) exp {
 func parse_pm(st *lex.Lexer) exp {
 	left := parse_lit(st)
 	fmt.Printf("%+v, (pm)\n", st.Peek())
+	fmt.Printf("%+v, (pm left)\n", left)
 	switch st.Peek().T {
 	case lex.Add:
 		st.Eat()
@@ -32,12 +33,11 @@ func parse_lit(st *lex.Lexer) exp {
 	fmt.Printf("%+v, (lit)\n", st.Peek())
 	switch st.Peek().T {
 	case lex.String:
-		st.Eat()
-		return exp(LitExp{value: st.Peek().Value})
+		tok := st.Eat()
+		return exp(LitExp{value: tok.Value})
 	case lex.Integer:
-		st.Eat()
-		fmt.Println("RETURNING!")
-		return exp(LitExp{value: st.Peek().Value})
+		tok := st.Eat()
+		return exp(LitExp{value: tok.Value})
 	default:
 		fmt.Println("BAM!")
 		return exp(LitExp{value: nil})
