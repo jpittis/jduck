@@ -10,8 +10,12 @@ func Parse(st *lex.Lexer) []stmt {
 	for st.Peek().T != lex.EOF {
 		switch st.Peek().T {
 		case lex.Ident:
+			tok := st.Eat()
+			if st.Peek().T != lex.Eq {
+				fmt.Println("equals not found after name")
+			}
 			st.Eat()
-			s = append(s, parse_ident(st))
+			s = append(s, parse_ident(st, tok.Value.(string)))
 		case lex.Print:
 			st.Eat()
 			s = append(s, parse_print(st))
@@ -22,12 +26,14 @@ func Parse(st *lex.Lexer) []stmt {
 	return s
 }
 
-func parse_ident(st *lex.Lexer) stmt {
-	return nil
+func parse_ident(st *lex.Lexer, name string) stmt {
+	e := parse_exp(st)
+	return stmt(VarStmt{Name: name, Equals: e})
 }
 
 func parse_print(st *lex.Lexer) stmt {
-	return nil
+	e := parse_exp(st)
+	return stmt(PrintStmt{Print: e})
 }
 
 func parse_exp(st *lex.Lexer) exp {

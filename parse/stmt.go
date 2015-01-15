@@ -5,10 +5,18 @@ type stmt interface {
 }
 
 type VarStmt struct {
-	name   string
-	equals exp
+	Name   string
+	Equals exp
 }
 
 func (s VarStmt) Exec() {
+	return
+}
+
+type PrintStmt struct {
+	Print exp
+}
+
+func (s PrintStmt) Exec() {
 	return
 }
