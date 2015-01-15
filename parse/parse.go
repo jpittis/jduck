@@ -13,6 +13,18 @@ func parse_exp(st *lex.Lexer) exp {
 	return parse_bb(st)
 }
 
+func parse_paren(st *lex.Lexer) exp {
+	left := parse_bb(st)
+	switch st.Peek().T {
+	case lex.RParen:
+		st.Eat()
+		return left
+	default:
+		fmt.Println("paren not closed")
+		return nil
+	}
+}
+
 func parse_bb(st *lex.Lexer) exp {
 	left := parse_ub(st)
 	switch st.Peek().T {
@@ -109,8 +121,11 @@ func parse_lit(st *lex.Lexer) exp {
 	case lex.Bool:
 		tok := st.Eat()
 		return exp(LitExp{value: tok.Value})
+	case lex.LParen:
+		st.Eat()
+		return parse_paren(st)
 	default:
-		fmt.Println("Unknown Literal Reached")
+		fmt.Println("unknown literal")
 		return exp(LitExp{value: nil})
 	}
 }

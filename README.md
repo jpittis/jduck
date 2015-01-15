@@ -9,6 +9,3 @@ A language built in the iconic basement lounge of Queen's Campus.
     4. ( )
     5. true false
     6. > < <= >= and or
-
-* Parsing Rules
-    1. * / % + -
