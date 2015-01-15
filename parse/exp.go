@@ -17,6 +17,35 @@ const (
 	NotEq
 )
 
+func (b BinType) String() string {
+	switch b {
+	case Add:
+		return "+"
+	case Sub:
+		return "-"
+	case Mul:
+		return "*"
+	case Div:
+		return "/"
+	case Mod:
+		return "%"
+	case GreatThan:
+		return ">"
+	case LessThan:
+		return "<"
+	case GreatThanEq:
+		return ">="
+	case LessThanEq:
+		return "<="
+	case EqEq:
+		return "=="
+	case NotEq:
+		return "!="
+	default:
+		return "error"
+	}
+}
+
 type UnaryType int
 
 const (

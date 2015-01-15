@@ -14,9 +14,7 @@ func parse_exp(st *lex.Lexer) exp {
 }
 
 func parse_pm(st *lex.Lexer) exp {
-	left := parse_lit(st)
-	fmt.Printf("%+v, (pm)\n", st.Peek())
-	fmt.Printf("%+v, (pm left)\n", left)
+	left := parse_md(st)
 	switch st.Peek().T {
 	case lex.Add:
 		st.Eat()
@@ -29,8 +27,21 @@ func parse_pm(st *lex.Lexer) exp {
 	}
 }
 
+func parse_md(st *lex.Lexer) exp {
+	left := parse_lit(st)
+	switch st.Peek().T {
+	case lex.Mul:
+		st.Eat()
+		return exp(BinExp{Op: Mul, Left: left, Right: parse_md(st)})
+	case lex.Div:
+		st.Eat()
+		return exp(BinExp{Op: Div, Left: left, Right: parse_md(st)})
+	default:
+		return left
+	}
+}
+
 func parse_lit(st *lex.Lexer) exp {
-	fmt.Printf("%+v, (lit)\n", st.Peek())
 	switch st.Peek().T {
 	case lex.String:
 		tok := st.Eat()
