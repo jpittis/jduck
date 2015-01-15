@@ -100,6 +100,9 @@ func (l *Lexer) unread() {
 
 func (l *Lexer) lex() (*Token, error) {
 	r, err := l.read()
+	if r == rune(0) {
+		return &Token{T: EOF}, nil
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -194,8 +197,6 @@ func (l *Lexer) lex() (*Token, error) {
 			return nil, err
 		}
 		return l.lex()
-	case r == rune(0):
-		return &Token{T: EOF}, nil
 	default:
 		return nil, fmt.Errorf("unknown rune '%s'", r)
 	}
@@ -203,6 +204,10 @@ func (l *Lexer) lex() (*Token, error) {
 
 func (l *Lexer) readSpace() error {
 	r, err := l.read()
+	if r == rune(0) {
+		l.unread()
+		return nil
+	}
 	if err != nil {
 		return err
 	}
