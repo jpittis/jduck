@@ -110,11 +110,11 @@ func (e VarExp) Eval() interface{} {
 	return nil
 }
 
-type FuncExp struct {
+/*type FuncExp struct {
 	Name   string
 	Params []exp
 }
 
 func (e FuncExp) Eval() interface{} {
 	return nil
-}
+}*/

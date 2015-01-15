@@ -121,6 +121,9 @@ func parse_lit(st *lex.Lexer) exp {
 	case lex.Bool:
 		tok := st.Eat()
 		return exp(LitExp{value: tok.Value})
+	case lex.Ident:
+		tok := st.Eat()
+		return exp(VarExp{Name: tok.Value.(string)})
 	case lex.LParen:
 		st.Eat()
 		return parse_paren(st)
