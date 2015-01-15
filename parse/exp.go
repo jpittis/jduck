@@ -44,3 +44,12 @@ type UnaryExp struct {
 	Operator UnaryType
 	Right    exp
 }
+
+type VarExp struct {
+	Name string
+}
+
+type FuncExp struct {
+	Name   string
+	Params []exp
+}
