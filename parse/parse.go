@@ -1,43 +1,45 @@
 package parse
 
 import (
+	"fmt"
 	"github.com/jpittis/jduck/lex"
 )
 
-func Parse(st *lex.Lexer) *exp {
+func Parse(st *lex.Lexer) exp {
 	return parse_exp(st)
 }
 
-func parse_exp(st *lex.Lexer) *exp {
-	if st.Peek().T == lex.EOL {
-		return nil
-	}
+func parse_exp(st *lex.Lexer) exp {
 	return parse_pm(st)
 }
 
-func parse_pm(st *lex.Lexer) *exp {
+func parse_pm(st *lex.Lexer) exp {
 	left := parse_lit(st)
+	fmt.Printf("%+v, (pm)\n", st.Peek())
 	switch st.Peek().T {
 	case lex.Add:
 		st.Eat()
-		return &exp{&BinExp{Op: Add, Left: left, Right: parse_lit(st)}}
+		return exp(BinExp{Op: Add, Left: left, Right: parse_pm(st)})
 	case lex.Sub:
 		st.Eat()
-		return &BinExp{Op: Sub, Left: left, Right: parse_lit(st)}
+		return exp(BinExp{Op: Sub, Left: left, Right: parse_pm(st)})
 	default:
-		return parse_exp(st)
+		return left
 	}
 }
 
-func parse_lit(st *lex.Lexer) *exp {
+func parse_lit(st *lex.Lexer) exp {
+	fmt.Printf("%+v, (lit)\n", st.Peek())
 	switch st.Peek().T {
 	case lex.String:
 		st.Eat()
-		return &LitExp{value: st.Peek().Value}
+		return exp(LitExp{value: st.Peek().Value})
 	case lex.Integer:
 		st.Eat()
-		return &LitExp{value: st.Peek().Value}
+		fmt.Println("RETURNING!")
+		return exp(LitExp{value: st.Peek().Value})
 	default:
-		return parse_exp(st)
+		fmt.Println("BAM!")
+		return exp(LitExp{value: nil})
 	}
 }

@@ -13,6 +13,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	l := lex.New(f)
+	st := lex.New(f)
 	fmt.Println(parse.Parse(st))
 }
