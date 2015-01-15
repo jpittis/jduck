@@ -21,7 +21,7 @@ type UnaryType int
 
 const (
 	Not UnaryType = iota
-	Min
+	Neg
 	AddAdd
 	SubSub
 )

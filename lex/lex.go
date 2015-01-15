@@ -32,11 +32,14 @@ const (
 
 	Bool
 
-	EqEq
 	LessThan
 	GreatThan
 	LessThanEq
 	GreatThanEq
+	EqEq
+	NotEq
+
+	Not
 
 	And
 	Or
@@ -121,6 +124,16 @@ func (l *Lexer) lex() (*Token, error) {
 		return &Token{T: LParen}, nil
 	case r == ')':
 		return &Token{T: RParen}, nil
+	case r == '!':
+		r, err = l.read()
+		if err != nil {
+			return nil, err
+		}
+		if r == '=' {
+			return &Token{T: NotEq}, nil
+		}
+		l.unread()
+		return &Token{T: Not}, nil
 	case r == '=':
 		r, err = l.read()
 		if err != nil {
