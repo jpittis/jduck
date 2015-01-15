@@ -15,6 +15,9 @@ const (
 	LessThanEq
 	EqEq
 	NotEq
+
+	And
+	Or
 )
 
 func (b BinType) String() string {
@@ -41,6 +44,10 @@ func (b BinType) String() string {
 		return "=="
 	case NotEq:
 		return "!="
+	case And:
+		return "&&"
+	case Or:
+		return "||"
 	default:
 		return "error"
 	}

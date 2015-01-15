@@ -34,6 +34,12 @@ func parse_bb(st *lex.Lexer) exp {
 	case lex.NotEq:
 		st.Eat()
 		return exp(BinExp{Op: NotEq, Left: left, Right: parse_bb(st)})
+	case lex.And:
+		st.Eat()
+		return exp(BinExp{Op: And, Left: left, Right: parse_bb(st)})
+	case lex.Or:
+		st.Eat()
+		return exp(BinExp{Op: Or, Left: left, Right: parse_bb(st)})
 	default:
 		return left
 	}

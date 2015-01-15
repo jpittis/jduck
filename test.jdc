@@ -1,1 +1,1 @@
-1 == ! true + 27 * 2;
+1 == ! true + 27 * 2 and false or true * 58 % 2;
