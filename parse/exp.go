@@ -1,5 +1,9 @@
 package parse
 
+import (
+	"log"
+)
+
 type BinType int
 
 const (
@@ -72,15 +76,15 @@ func (u UnaType) String() string {
 }
 
 type exp interface {
-	Eval() interface{}
+	Eval(map[string]interface{}) interface{}
 }
 
 type LitExp struct {
 	value interface{}
 }
 
-func (e LitExp) Eval() interface{} {
-	return nil
+func (e LitExp) Eval(map[string]interface{}) interface{} {
+	return e.value
 }
 
 type BinExp struct {
@@ -89,7 +93,129 @@ type BinExp struct {
 	Right exp
 }
 
-func (e BinExp) Eval() interface{} {
+func (e BinExp) Eval(data map[string]interface{}) interface{} {
+	lhs := e.Left.Eval(data)
+	rhs := e.Right.Eval(data)
+	switch e.Op {
+	case Add:
+		switch lhs.(type) {
+		case bool:
+			log.Fatal("cannot add booleans")
+		case int:
+			return lhs.(int) + rhs.(int)
+		case string:
+			return lhs.(string) + rhs.(string)
+		}
+	case Sub:
+		switch lhs.(type) {
+		case bool:
+			log.Fatal("cannot sub booleans")
+		case int:
+			return lhs.(int) - rhs.(int)
+		case string:
+			log.Fatal("cannot sub strings")
+		}
+	case Mul:
+		switch lhs.(type) {
+		case bool:
+			log.Fatal("cannot mul booleans")
+		case int:
+			return lhs.(int) * rhs.(int)
+		case string:
+			log.Fatal("cannot mul strings")
+		}
+	case Div:
+		switch lhs.(type) {
+		case bool:
+			log.Fatal("cannot div booleans")
+		case int:
+			return lhs.(int) / rhs.(int)
+		case string:
+			log.Fatal("cannot div strings")
+		}
+	case Mod:
+		switch lhs.(type) {
+		case bool:
+			log.Fatal("cannot mod booleans")
+		case int:
+			return lhs.(int) % rhs.(int)
+		case string:
+			log.Fatal("cannot mod strings")
+		}
+	case GreatThan:
+		switch lhs.(type) {
+		case bool:
+			log.Fatal("boolean not int")
+		case int:
+			return lhs.(int) > rhs.(int)
+		case string:
+			log.Fatal("string not int")
+		}
+	case LessThan:
+		switch lhs.(type) {
+		case bool:
+			log.Fatal("boolean not int")
+		case int:
+			return lhs.(int) < rhs.(int)
+		case string:
+			log.Fatal("string not int")
+		}
+	case GreatThanEq:
+		switch lhs.(type) {
+		case bool:
+			log.Fatal("boolean not int")
+		case int:
+			return lhs.(int) >= rhs.(int)
+		case string:
+			log.Fatal("string not int")
+		}
+	case LessThanEq:
+		switch lhs.(type) {
+		case bool:
+			log.Fatal("boolean not int")
+		case int:
+			return lhs.(int) <= rhs.(int)
+		case string:
+			log.Fatal("string not int")
+		}
+	case EqEq:
+		switch lhs.(type) {
+		case bool:
+			return lhs.(bool) == rhs.(bool)
+		case int:
+			return lhs.(int) == rhs.(int)
+		case string:
+			return lhs.(string) == rhs.(string)
+		}
+	case NotEq:
+		switch lhs.(type) {
+		case bool:
+			return lhs.(bool) != rhs.(bool)
+		case int:
+			return lhs.(int) != rhs.(int)
+		case string:
+			return lhs.(string) != rhs.(string)
+		}
+	case And:
+		switch lhs.(type) {
+		case bool:
+			return lhs.(bool) && rhs.(bool)
+		case int:
+			log.Fatal("int not boolean")
+		case string:
+			log.Fatal("string not boolean")
+		}
+	case Or:
+		switch lhs.(type) {
+		case bool:
+			return lhs.(bool) || rhs.(bool)
+		case int:
+			log.Fatal("int not boolean")
+		case string:
+			log.Fatal("string not boolean")
+		}
+	}
+	log.Fatal("unknown type")
 	return nil
 }
 
@@ -98,7 +224,29 @@ type UnaExp struct {
 	Right exp
 }
 
-func (e UnaExp) Eval() interface{} {
+func (e UnaExp) Eval(data map[string]interface{}) interface{} {
+	rhs := e.Right.Eval(data)
+	switch e.Op {
+	case Not:
+		switch rhs.(type) {
+		case bool:
+			return !rhs.(bool)
+		case int:
+			log.Fatal("int not boolean")
+		case string:
+			log.Fatal("string not boolean")
+		}
+	case Neg:
+		switch rhs.(type) {
+		case bool:
+			log.Fatal("bool not int")
+		case int:
+			return rhs.(int) * -1
+		case string:
+			log.Fatal("string not int")
+		}
+	}
+	log.Fatal("type not found")
 	return nil
 }
 
@@ -106,8 +254,12 @@ type VarExp struct {
 	Name string
 }
 
-func (e VarExp) Eval() interface{} {
-	return nil
+func (e VarExp) Eval(data map[string]interface{}) interface{} {
+	val, pres := data[e.Name]
+	if !pres {
+		log.Fatal("variable not declared")
+	}
+	return val
 }
 
 /*type FuncExp struct {

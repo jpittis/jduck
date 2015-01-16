@@ -1,7 +1,11 @@
 package parse
 
-type stmt interface {
-	Exec()
+import (
+	"fmt"
+)
+
+type Stmt interface {
+	Exec(map[string]interface{})
 }
 
 type VarStmt struct {
@@ -9,14 +13,14 @@ type VarStmt struct {
 	Equals exp
 }
 
-func (s VarStmt) Exec() {
-	return
+func (s VarStmt) Exec(data map[string]interface{}) {
+	data[s.Name] = s.Equals.Eval(data)
 }
 
 type PrintStmt struct {
 	Print exp
 }
 
-func (s PrintStmt) Exec() {
-	return
+func (s PrintStmt) Exec(data map[string]interface{}) {
+	fmt.Println(s.Print.Eval(data))
 }

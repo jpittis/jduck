@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"github.com/jpittis/jduck/lex"
 	"github.com/jpittis/jduck/parse"
+	"github.com/jpittis/jduck/run"
 	"log"
 	"os"
 )
@@ -14,5 +14,6 @@ func main() {
 		log.Fatal(err)
 	}
 	st := lex.New(f)
-	fmt.Println(parse.Parse(st))
+	ast := parse.Parse(st)
+	run.Run(ast)
 }

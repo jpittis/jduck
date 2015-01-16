@@ -5,8 +5,8 @@ import (
 	"github.com/jpittis/jduck/lex"
 )
 
-func Parse(st *lex.Lexer) []stmt {
-	s := make([]stmt, 0)
+func Parse(st *lex.Lexer) []Stmt {
+	s := make([]Stmt, 0)
 	for st.Peek().T != lex.EOF {
 		switch st.Peek().T {
 		case lex.Ident:
@@ -26,14 +26,14 @@ func Parse(st *lex.Lexer) []stmt {
 	return s
 }
 
-func parse_ident(st *lex.Lexer, name string) stmt {
+func parse_ident(st *lex.Lexer, name string) Stmt {
 	e := parse_exp(st)
-	return stmt(VarStmt{Name: name, Equals: e})
+	return Stmt(VarStmt{Name: name, Equals: e})
 }
 
-func parse_print(st *lex.Lexer) stmt {
+func parse_print(st *lex.Lexer) Stmt {
 	e := parse_exp(st)
-	return stmt(PrintStmt{Print: e})
+	return Stmt(PrintStmt{Print: e})
 }
 
 func parse_exp(st *lex.Lexer) exp {

@@ -1,1 +1,6 @@
-erik = 5 + 5
+apple = ((5 + 5) * 10) / 2
+orange = 50
+print apple
+print orange
+print apple * orange
+print apple * orange + 20 / 4
