@@ -28,15 +28,38 @@ func (s PrintStmt) Exec(data map[string]interface{}) {
 type IfStmt struct {
 	If   exp
 	Then []Stmt
-	Else []Stmt
+	Else IfStmt
 }
 
 func (s IfStmt) Exec(data map[string]interface{}) {
+
 }
 
 type ForStmt struct {
-	Body []Stmt
+	Init   exp
+	Bool   exp
+	Change exp
+	Body   []Stmt
 }
 
 func (s ForStmt) Exec(data map[string]interface{}) {
+
 }
+
+type WhileStmt struct {
+	Bool exp
+	Body []Stmt
+}
+
+func (s WhileStmt) Exec(data map[string]interface{}) {
+
+}
+
+/*type FuncStmt struct {
+	Body   []Stmt
+}
+
+func (s WhileStmt) Exec(data map[string]interface{}) {
+
+}
+*/
