@@ -24,3 +24,19 @@ type PrintStmt struct {
 func (s PrintStmt) Exec(data map[string]interface{}) {
 	fmt.Println(s.Print.Eval(data))
 }
+
+type IfStmt struct {
+	If   exp
+	Then []Stmt
+	Else []Stmt
+}
+
+func (s IfStmt) Exec(data map[string]interface{}) {
+}
+
+type ForStmt struct {
+	Body []Stmt
+}
+
+func (s ForStmt) Exec(data map[string]interface{}) {
+}

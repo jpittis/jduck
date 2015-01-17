@@ -1,4 +1,14 @@
 anna = 99
 erik = 72
-print "is anna greater than erik!?"
+message = "is anna greater than erik!?"
+
+hello = "hello, "
+
+print message
+
+print hello + "world"
+print hello + "Erik!"
+
 print anna > erik
+pi = 3
+print anna + 83 - (88 * 22 + pi) * 37 % 3
