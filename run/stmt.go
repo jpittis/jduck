@@ -28,15 +28,15 @@ func (s PrintStmt) Exec(data map[string]interface{}) {
 type IfStmt struct {
 	If   Exp
 	Then []Stmt
-	Else Stmt
+	Else []Stmt
 }
 
 func (s IfStmt) Exec(data map[string]interface{}) {
 	b := s.If.Eval(data)
 	if b.(bool) {
 		Run_all(s.Then, data)
-	} else {
-		s.Else.Exec(data)
+	} else if s.Else != nil {
+		Run_all(s.Else, data)
 	}
 }
 

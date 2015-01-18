@@ -13,8 +13,10 @@ print anna > erik
 pi = 3
 print anna + 83 - (88 * 22 + pi) * 37 % 3
 
-bool = false
+bool = true
 
 if bool
 print "dorka dorka"
+else
+print "beta beta"
 end

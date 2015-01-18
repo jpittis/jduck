@@ -32,27 +32,24 @@ func Parse(st *lex.Lexer) []run.Stmt {
 		case lex.End:
 			st.Eat()
 			return s
+		case lex.Else:
+			return s
 		default:
-			fmt.Println("statement type not found")
+			//fmt.Printf("statement type not found %s\n", st.Peek().T)
 		}
 	}
 	return s
 }
 
 func parse_if(st *lex.Lexer) run.Stmt {
+	fmt.Println(st.Peek().T)
 	b := parse_exp(st)
 	body := parse_body(st)
-	var rest run.Stmt
+	var rest []run.Stmt
+	fmt.Println(st.Peek().T)
 	if st.Peek().T == lex.Else {
 		st.Eat()
-		if st.Peek().T == lex.If {
-			st.Eat()
-			rest = parse_if(st)
-		} else {
-			elsebody := parse_body(st)
-			t := run.LitExp{Value: true}
-			rest = run.IfStmt{If: t, Then: elsebody}
-		}
+		rest = parse_body(st)
 	}
 	return run.IfStmt{If: b, Then: body, Else: rest}
 }
