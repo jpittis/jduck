@@ -20,8 +20,7 @@ const (
 	For
 	While
 
-	LBrack
-	RBrack
+	End
 
 	Print
 	Func
@@ -126,10 +125,6 @@ func (l *Lexer) lex() (*Token, error) {
 		return &Token{T: LParen}, nil
 	case r == ')':
 		return &Token{T: RParen}, nil
-	case r == '{':
-		return &Token{T: LBrack}, nil
-	case r == '}':
-		return &Token{T: RBrack}, nil
 	case r == ';':
 		return &Token{T: EOL}, nil
 	case r == '!':
@@ -272,6 +267,8 @@ func lookup(ident string) *Token {
 		return &Token{T: For}
 	case "while":
 		return &Token{T: While}
+	case "end":
+		return &Token{T: End}
 	case "print":
 		return &Token{T: Print}
 	case "func":

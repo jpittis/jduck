@@ -1,4 +1,4 @@
-package parse
+package run
 
 import (
 	"log"
@@ -75,22 +75,22 @@ func (u UnaType) String() string {
 	}
 }
 
-type exp interface {
+type Exp interface {
 	Eval(map[string]interface{}) interface{}
 }
 
 type LitExp struct {
-	value interface{}
+	Value interface{}
 }
 
 func (e LitExp) Eval(map[string]interface{}) interface{} {
-	return e.value
+	return e.Value
 }
 
 type BinExp struct {
 	Op    BinType
-	Left  exp
-	Right exp
+	Left  Exp
+	Right Exp
 }
 
 func (e BinExp) Eval(data map[string]interface{}) interface{} {
@@ -221,7 +221,7 @@ func (e BinExp) Eval(data map[string]interface{}) interface{} {
 
 type UnaExp struct {
 	Op    UnaType
-	Right exp
+	Right Exp
 }
 
 func (e UnaExp) Eval(data map[string]interface{}) interface{} {

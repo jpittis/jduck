@@ -3,10 +3,11 @@ package parse
 import (
 	"fmt"
 	"github.com/jpittis/jduck/lex"
+	"github.com/jpittis/jduck/run"
 )
 
-func Parse(st *lex.Lexer) []Stmt {
-	s := make([]Stmt, 0)
+func Parse(st *lex.Lexer) []run.Stmt {
+	s := make([]run.Stmt, 0)
 	for st.Peek().T != lex.EOF {
 		switch st.Peek().T {
 		case lex.Ident:
@@ -19,6 +20,18 @@ func Parse(st *lex.Lexer) []Stmt {
 		case lex.Print:
 			st.Eat()
 			s = append(s, parse_print(st))
+		case lex.If:
+			st.Eat()
+			s = append(s, parse_if(st))
+			/*		case lex.For:
+					st.Eat()
+					s = append(s, parse_for(st)) */
+		case lex.While:
+			st.Eat()
+			s = append(s, parse_while(st))
+		case lex.End:
+			st.Eat()
+			return s
 		default:
 			fmt.Println("statement type not found")
 		}
@@ -26,21 +39,53 @@ func Parse(st *lex.Lexer) []Stmt {
 	return s
 }
 
-func parse_ident(st *lex.Lexer, name string) Stmt {
-	e := parse_exp(st)
-	return Stmt(VarStmt{Name: name, Equals: e})
+func parse_if(st *lex.Lexer) run.Stmt {
+	b := parse_exp(st)
+	body := parse_body(st)
+	var rest run.Stmt
+	if st.Peek().T == lex.Else {
+		st.Eat()
+		if st.Peek().T == lex.If {
+			st.Eat()
+			rest = parse_if(st)
+		} else {
+			elsebody := parse_body(st)
+			t := run.LitExp{Value: true}
+			rest = run.IfStmt{If: t, Then: elsebody}
+		}
+	}
+	return run.IfStmt{If: b, Then: body, Else: rest}
 }
 
-func parse_print(st *lex.Lexer) Stmt {
-	e := parse_exp(st)
-	return Stmt(PrintStmt{Print: e})
+/*func parse_for(st *lex.Lexer) Stmt {
+
+}*/
+
+func parse_while(st *lex.Lexer) run.Stmt {
+	b := parse_exp(st)
+	body := parse_body(st)
+	return run.WhileStmt{Bool: b, Body: body}
 }
 
-func parse_exp(st *lex.Lexer) exp {
+func parse_body(st *lex.Lexer) []run.Stmt {
+	return Parse(st)
+}
+
+func parse_ident(st *lex.Lexer, name string) run.Stmt {
+	e := parse_exp(st)
+	return run.Stmt(run.VarStmt{Name: name, Equals: e})
+}
+
+func parse_print(st *lex.Lexer) run.Stmt {
+	e := parse_exp(st)
+	return run.Stmt(run.PrintStmt{Print: e})
+}
+
+func parse_exp(st *lex.Lexer) run.Exp {
 	return parse_bb(st)
 }
 
-func parse_paren(st *lex.Lexer) exp {
+func parse_paren(st *lex.Lexer) run.Exp {
 	left := parse_bb(st)
 	switch st.Peek().T {
 	case lex.RParen:
@@ -52,110 +97,110 @@ func parse_paren(st *lex.Lexer) exp {
 	}
 }
 
-func parse_bb(st *lex.Lexer) exp {
+func parse_bb(st *lex.Lexer) run.Exp {
 	left := parse_ub(st)
 	switch st.Peek().T {
 	case lex.GreatThan:
 		st.Eat()
-		return exp(BinExp{Op: GreatThan, Left: left, Right: parse_bb(st)})
+		return run.Exp(run.BinExp{Op: run.GreatThan, Left: left, Right: parse_bb(st)})
 	case lex.LessThan:
 		st.Eat()
-		return exp(BinExp{Op: LessThan, Left: left, Right: parse_bb(st)})
+		return run.Exp(run.BinExp{Op: run.LessThan, Left: left, Right: parse_bb(st)})
 	case lex.GreatThanEq:
 		st.Eat()
-		return exp(BinExp{Op: GreatThanEq, Left: left, Right: parse_bb(st)})
+		return run.Exp(run.BinExp{Op: run.GreatThanEq, Left: left, Right: parse_bb(st)})
 	case lex.LessThanEq:
 		st.Eat()
-		return exp(BinExp{Op: LessThanEq, Left: left, Right: parse_bb(st)})
+		return run.Exp(run.BinExp{Op: run.LessThanEq, Left: left, Right: parse_bb(st)})
 	case lex.EqEq:
 		st.Eat()
-		return exp(BinExp{Op: EqEq, Left: left, Right: parse_bb(st)})
+		return run.Exp(run.BinExp{Op: run.EqEq, Left: left, Right: parse_bb(st)})
 	case lex.NotEq:
 		st.Eat()
-		return exp(BinExp{Op: NotEq, Left: left, Right: parse_bb(st)})
+		return run.Exp(run.BinExp{Op: run.NotEq, Left: left, Right: parse_bb(st)})
 	case lex.And:
 		st.Eat()
-		return exp(BinExp{Op: And, Left: left, Right: parse_bb(st)})
+		return run.Exp(run.BinExp{Op: run.And, Left: left, Right: parse_bb(st)})
 	case lex.Or:
 		st.Eat()
-		return exp(BinExp{Op: Or, Left: left, Right: parse_bb(st)})
+		return run.Exp(run.BinExp{Op: run.Or, Left: left, Right: parse_bb(st)})
 	default:
 		return left
 	}
 }
 
-func parse_ub(st *lex.Lexer) exp {
+func parse_ub(st *lex.Lexer) run.Exp {
 	left := parse_pm(st)
 	switch st.Peek().T {
 	case lex.Not:
 		st.Eat()
-		return exp(UnaExp{Op: Not, Right: parse_ub(st)})
+		return run.Exp(run.UnaExp{Op: run.Not, Right: parse_ub(st)})
 	default:
 		return left
 	}
 }
 
-func parse_pm(st *lex.Lexer) exp {
+func parse_pm(st *lex.Lexer) run.Exp {
 	left := parse_md(st)
 	switch st.Peek().T {
 	case lex.Add:
 		st.Eat()
-		return exp(BinExp{Op: Add, Left: left, Right: parse_pm(st)})
+		return run.Exp(run.BinExp{Op: run.Add, Left: left, Right: parse_pm(st)})
 	case lex.Sub:
 		st.Eat()
-		return exp(BinExp{Op: Sub, Left: left, Right: parse_pm(st)})
+		return run.Exp(run.BinExp{Op: run.Sub, Left: left, Right: parse_pm(st)})
 	default:
 		return left
 	}
 }
 
-func parse_md(st *lex.Lexer) exp {
+func parse_md(st *lex.Lexer) run.Exp {
 	left := parse_um(st)
 	switch st.Peek().T {
 	case lex.Mul:
 		st.Eat()
-		return exp(BinExp{Op: Mul, Left: left, Right: parse_md(st)})
+		return run.Exp(run.BinExp{Op: run.Mul, Left: left, Right: parse_md(st)})
 	case lex.Div:
 		st.Eat()
-		return exp(BinExp{Op: Div, Left: left, Right: parse_md(st)})
+		return run.Exp(run.BinExp{Op: run.Div, Left: left, Right: parse_md(st)})
 	case lex.Mod:
 		st.Eat()
-		return exp(BinExp{Op: Mod, Left: left, Right: parse_md(st)})
+		return run.Exp(run.BinExp{Op: run.Mod, Left: left, Right: parse_md(st)})
 	default:
 		return left
 	}
 }
 
-func parse_um(st *lex.Lexer) exp {
+func parse_um(st *lex.Lexer) run.Exp {
 	left := parse_lit(st)
 	switch st.Peek().T {
 	case lex.Sub:
 		st.Eat()
-		return exp(UnaExp{Op: Neg, Right: parse_um(st)})
+		return run.Exp(run.UnaExp{Op: run.Neg, Right: parse_um(st)})
 	default:
 		return left
 	}
 }
 
-func parse_lit(st *lex.Lexer) exp {
+func parse_lit(st *lex.Lexer) run.Exp {
 	switch st.Peek().T {
 	case lex.String:
 		tok := st.Eat()
-		return exp(LitExp{value: tok.Value})
+		return run.Exp(run.LitExp{Value: tok.Value})
 	case lex.Integer:
 		tok := st.Eat()
-		return exp(LitExp{value: tok.Value})
+		return run.Exp(run.LitExp{Value: tok.Value})
 	case lex.Bool:
 		tok := st.Eat()
-		return exp(LitExp{value: tok.Value})
+		return run.Exp(run.LitExp{Value: tok.Value})
 	case lex.Ident:
 		tok := st.Eat()
-		return exp(VarExp{Name: tok.Value.(string)})
+		return run.Exp(run.VarExp{Name: tok.Value.(string)})
 	case lex.LParen:
 		st.Eat()
 		return parse_paren(st)
 	default:
 		fmt.Println("unknown literal")
-		return exp(LitExp{value: nil})
+		return run.Exp(run.LitExp{Value: nil})
 	}
 }

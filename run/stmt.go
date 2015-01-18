@@ -1,4 +1,4 @@
-package parse
+package run
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ type Stmt interface {
 
 type VarStmt struct {
 	Name   string
-	Equals exp
+	Equals Exp
 }
 
 func (s VarStmt) Exec(data map[string]interface{}) {
@@ -18,7 +18,7 @@ func (s VarStmt) Exec(data map[string]interface{}) {
 }
 
 type PrintStmt struct {
-	Print exp
+	Print Exp
 }
 
 func (s PrintStmt) Exec(data map[string]interface{}) {
@@ -26,23 +26,23 @@ func (s PrintStmt) Exec(data map[string]interface{}) {
 }
 
 type IfStmt struct {
-	If   exp
+	If   Exp
 	Then []Stmt
-	Else IfStmt
+	Else Stmt
 }
 
 func (s IfStmt) Exec(data map[string]interface{}) {
-	b := If.Eval(data)
-	if b {
-		run.Run_all(s.Then, data)
+	b := s.If.Eval(data)
+	if b.(bool) {
+		Run_all(s.Then, data)
 	} else {
-		s.IfStmt.Exec(data)
+		s.Else.Exec(data)
 	}
 }
 
 type ForStmt struct {
 	Init   Stmt
-	Bool   exp
+	Bool   Exp
 	Change Stmt
 	Body   []Stmt
 }
@@ -50,22 +50,22 @@ type ForStmt struct {
 func (s ForStmt) Exec(data map[string]interface{}) {
 	s.Init.Exec(data)
 	b := s.Bool.Eval(data)
-	for b {
-		run.Run_all(s.body, data)
+	for b.(bool) {
+		Run_all(s.Body, data)
 		s.Change.Exec(data)
 		b = s.Bool.Eval(data)
 	}
 }
 
 type WhileStmt struct {
-	Bool exp
+	Bool Exp
 	Body []Stmt
 }
 
 func (s WhileStmt) Exec(data map[string]interface{}) {
 	b := s.Bool.Eval(data)
-	for b {
-		run.Run_all(s.body, data)
+	for b.(bool) {
+		Run_all(s.Body, data)
 		b = s.Bool.Eval(data)
 	}
 }
