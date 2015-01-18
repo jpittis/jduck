@@ -25,7 +25,44 @@ Produce:
 true
 ````
 
-### Milestone 3 [In Progress!]
+### Milestone 3 [Complete!]
 
-* Control structures! (if, else, for)
+Given:
 
+````
+bool = true
+if bool
+    print "bool is true"
+else
+    print "bool is false"
+end
+````
+
+Produce:
+
+````
+bool is true
+````
+
+Given:
+
+````
+x = 0
+while x < 4
+    print x
+    x = x + 1
+end
+````
+
+Produce:
+
+````
+0
+1
+2
+3
+````
+
+### Milestone 4 [In Progress!]
+
+Function time!
