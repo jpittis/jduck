@@ -34,21 +34,27 @@ type IfStmt struct {
 func (s IfStmt) Exec(data map[string]interface{}) {
 	b := If.Eval(data)
 	if b {
-
+		run.Run_all(s.Then, data)
 	} else {
-
+		s.IfStmt.Exec(data)
 	}
 }
 
 type ForStmt struct {
-	Init   exp
+	Init   Stmt
 	Bool   exp
-	Change exp
+	Change Stmt
 	Body   []Stmt
 }
 
 func (s ForStmt) Exec(data map[string]interface{}) {
-
+	s.Init.Exec(data)
+	b := s.Bool.Eval(data)
+	for b {
+		run.Run_all(s.body, data)
+		s.Change.Exec(data)
+		b = s.Bool.Eval(data)
+	}
 }
 
 type WhileStmt struct {
@@ -57,7 +63,11 @@ type WhileStmt struct {
 }
 
 func (s WhileStmt) Exec(data map[string]interface{}) {
-
+	b := s.Bool.Eval(data)
+	for b {
+		run.Run_all(s.body, data)
+		b = s.Bool.Eval(data)
+	}
 }
 
 /*type FuncStmt struct {

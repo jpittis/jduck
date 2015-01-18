@@ -14,6 +14,12 @@ func Run(ast []parse.Stmt) {
 	}
 }
 
+func Run_all(s []parse.Stmt, data map[string]interface{}) {
+	for _, s := range s {
+		run_stmt(s, data)
+	}
+}
+
 func run_stmt(s parse.Stmt, data map[string]interface{}) {
 	s.Exec(data)
 }
