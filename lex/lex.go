@@ -15,6 +15,14 @@ const (
 	String TokenType = iota
 	Integer
 
+	If
+	Else
+	For
+	While
+
+	LBrack
+	RBrack
+
 	Print
 	Func
 
@@ -118,6 +126,10 @@ func (l *Lexer) lex() (*Token, error) {
 		return &Token{T: LParen}, nil
 	case r == ')':
 		return &Token{T: RParen}, nil
+	case r == '{':
+		return &Token{T: LBrack}, nil
+	case r == '}':
+		return &Token{T: RBrack}, nil
 	case r == ';':
 		return &Token{T: EOL}, nil
 	case r == '!':
@@ -252,6 +264,14 @@ func lookup(ident string) *Token {
 		return &Token{T: And}
 	case "or":
 		return &Token{T: Or}
+	case "if":
+		return &Token{T: If}
+	case "else":
+		return &Token{T: Else}
+	case "for":
+		return &Token{T: For}
+	case "while":
+		return &Token{T: While}
 	case "print":
 		return &Token{T: Print}
 	case "func":

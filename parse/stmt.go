@@ -32,7 +32,12 @@ type IfStmt struct {
 }
 
 func (s IfStmt) Exec(data map[string]interface{}) {
+	b := If.Eval(data)
+	if b {
 
+	} else {
+
+	}
 }
 
 type ForStmt struct {
