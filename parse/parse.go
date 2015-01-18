@@ -23,9 +23,9 @@ func Parse(st *lex.Lexer) []run.Stmt {
 		case lex.If:
 			st.Eat()
 			s = append(s, parse_if(st))
-			/*		case lex.For:
-					st.Eat()
-					s = append(s, parse_for(st)) */
+			/*	case lex.For:
+				st.Eat()
+				s = append(s, parse_for(st))*/
 		case lex.While:
 			st.Eat()
 			s = append(s, parse_while(st))
@@ -35,7 +35,7 @@ func Parse(st *lex.Lexer) []run.Stmt {
 		case lex.Else:
 			return s
 		default:
-			//fmt.Printf("statement type not found %s\n", st.Peek().T)
+			fmt.Printf("statement type not found %s\n", st.Peek().T)
 		}
 	}
 	return s
