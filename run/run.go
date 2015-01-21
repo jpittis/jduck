@@ -18,23 +18,42 @@ func NewContext() *Context {
 
 // Push adds a new scope to the context.
 func (c *Context) Push() {
-
+	layer := make(map[string]interface{})
+	c.scope.Push(layer)
 }
 
 // Pop removes last scope from context.
 // Returns Error if size of stack is 1.
 func (c *Context) Pop() error {
-
+	if c.scope.Size() == 1 {
+		return errors.New("cannot pop last global layer of stack")
+	}
+	_, err := c.scope.Pop()
+	return err
 }
 
 // Let sets variable in current context.
-func (c *Context) Let() error {
-
+func (c *Context) Let(key string, value interface{}) error {
+	scope := c.scope.Peek()
+	_, prs := m[key]
+	if prs {
+		return errors.New("variable already set")
+	}
+	m[key] = value
+	return nil
 }
 
 // Set sets already set variable in first context found.
-func (c *Context) Set() error {
+func (c *Context) Set(key string, value interface{}) error {
+	top, err := c.scope.Entity()
+	for err == nil {
+		_, prs := m[key]
+		if prs {
+			m[key] = value
+			return nil
+		}
 
+	}
 }
 
 // Get returns variable highest on the stack.
