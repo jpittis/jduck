@@ -1,5 +1,8 @@
 package run
 
+type Context struct {
+}
+
 func Run(ast []Stmt) {
 	data := make(map[string]interface{})
 	Run_all(ast, data)
