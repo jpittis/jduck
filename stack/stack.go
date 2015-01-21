@@ -7,7 +7,7 @@ import (
 
 // Top level stack header.
 type Stack struct {
-	top  *entity // the top entity on the stack
+	top  *Entity // the top Entity on the stack
 	size int     // total number of entities in the stack
 }
 
@@ -17,14 +17,20 @@ func New() *Stack {
 }
 
 // Value in the stack. Stored as linked list.
-type entity struct {
+type Entity struct {
 	value map[string]interface{} // interface value for storing anything
-	next  *entity                // the entity below current
+	next  *Entity                // the Entity below current
+}
+
+// Entity returns a pointer to top Entity.
+// Effectively turns stack into linked list.
+func (s *Stack) Entity() *Entity {
+	return s.top
 }
 
 // Push adds a value to the top of the stack.
 func (s *Stack) Push(value map[string]interface{}) {
-	newTop := &entity{value: value, next: nil}
+	newTop := &Entity{value: value, next: nil}
 
 	if s.size != 0 {
 		newTop.next = s.top
