@@ -1,4 +1,4 @@
-// Package lex provides methods for lexing from a reader.
+// Package lex provides methods for lexing jduck files.
 package lex
 
 import (
@@ -14,21 +14,18 @@ type TokenType int
 const (
 	String TokenType = iota
 	Integer
+	Bool
 
 	If
 	Else
-	For
 	While
-
+	For
+	Func
 	End
 
 	Print
-	Func
 
 	Ident
-
-	EOL
-	EOF
 
 	Eq
 
@@ -41,71 +38,78 @@ const (
 	LParen
 	RParen
 
-	Bool
-
 	LessThan
 	GreatThan
 	LessThanEq
 	GreatThanEq
 	EqEq
 	NotEq
+	And
+	Or
 
 	Not
 
-	And
-	Or
+	EOL // do I even need EOL?
+	EOF
 )
 
 // Token holds a type and a possible value.
 type Token struct {
-	T     TokenType
-	Value interface{}
+	T     TokenType   // type of token
+	Value interface{} // value of type
 }
 
 // Lexer is used to lex tokens from a reader.
 type Lexer struct {
-	reader *bufio.Reader
-	token  *Token
+	reader *bufio.Reader // reader for jduck file
+	token  *Token        // token buffer
 }
 
+// New creates a new lexer on given file.
 func New(reader io.Reader) *Lexer {
 	return &Lexer{reader: bufio.NewReader(reader)}
 }
 
 // Peek returns the last read token.
-func (l *Lexer) Peek() *Token { // TODO handle errors
+func (l *Lexer) Peek() (*Token, error) {
 	if l.token == nil {
-		t, _ := l.lex()
+		t, err := l.lex()
+		if err != nil {
+			return nil, err
+		}
 		l.token = t
 	}
-	return l.token
+	return l.token, nil
 }
 
 // Eat returns the last read token while reading another.
-func (l *Lexer) Eat() *Token { // TODO handle errors
-	if l.token == nil {
-		t, _ := l.lex()
-		l.token = t
+func (l *Lexer) Eat() (*Token, error) {
+	temp, err := l.Peek()
+	if err != nil {
+		return nil, err
 	}
-	temp := l.token
-	t, _ := l.lex()
+	t, err := l.lex()
+	if err != nil {
+		return nil, err
+	}
 	l.token = t
-	return temp
+	return temp, nil
 }
 
+// Reads one rune from the file.
 func (l *Lexer) read() (rune, error) {
 	r, _, err := l.reader.ReadRune()
 	return r, err
 }
 
 func (l *Lexer) unread() {
-	l.reader.UnreadRune() // error not handled only ReadRune() used
+	l.reader.UnreadRune() // not handled because only ReadRune() used
 }
 
 func (l *Lexer) lex() (*Token, error) {
 	r, err := l.read()
-	if r == rune(0) {
-		return &Token{T: EOF}, nil
+	if err == io.EOF {
+		return &Token{T: EOF}, nil // return end of file token
 	}
 	if err != nil {
 		return nil, err
@@ -169,61 +173,57 @@ func (l *Lexer) lex() (*Token, error) {
 		return &Token{T: LessThan}, nil
 	case r == '"':
 		var runes string
-		r, err = l.read()
-		if err != nil {
-			return nil, err
-		}
+		r, err := l.read()
 		for r != '"' {
-			if r == rune(0) {
-				return nil, fmt.Errorf("end of file before end of string")
-			}
-			runes += string(r)
-			r, err = l.read()
 			if err != nil {
 				return nil, err
 			}
+			runes += string(r)
+			r, err = l.read()
 		}
 		return &Token{T: String, Value: runes}, nil
 	case isNumber(r):
 		var runes string
+		r, err := l.read()
 		for isNumber(r) {
-			runes += string(r)
-			r, err = l.read()
 			if err != nil {
 				return nil, err
 			}
+			runes += string(r)
+			r, err = l.read()
 		}
 		l.unread()
 		i, err := strconv.Atoi(runes)
 		return &Token{T: Integer, Value: i}, err
 	case isLetter(r):
 		var runes string
+		r, err := l.read()
 		for isLetter(r) {
-			runes += string(r)
-			r, err = l.read()
 			if err != nil {
 				return nil, err
 			}
+			runes += string(r)
+			r, err = l.read()
 		}
 		l.unread()
-		return lookup(runes), nil
+		return lookup(runes), nil // return either ident or keyword token
 	case isSpace(r):
-		err = l.readSpace()
+		err = l.readSpace() // remove space
+		if err == io.EOF {
+			return &Token{T: EOF}, nil
+		}
 		if err != nil {
 			return nil, err
 		}
-		return l.lex()
+		return l.lex() // continue lexing
 	default:
-		return nil, fmt.Errorf("unknown rune '%s'", r)
+		return nil, fmt.Errorf("unknown rune '%v'", r)
 	}
 }
 
+// Reads all space up to next none space rune.
 func (l *Lexer) readSpace() error {
 	r, err := l.read()
-	if r == rune(0) {
-		l.unread()
-		return nil
-	}
 	if err != nil {
 		return err
 	}
@@ -237,18 +237,22 @@ func (l *Lexer) readSpace() error {
 	return nil
 }
 
+// Returns true if number.
 func isNumber(r rune) bool {
 	return r >= '0' && r <= '9'
 }
 
+// Returns true if letter.
 func isLetter(r rune) bool {
 	return (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z')
 }
 
+// Returns true if space, tab or newline.
 func isSpace(r rune) bool {
 	return r == ' ' || r == '\t' || r == '\n'
 }
 
+// Returns keyword token or default ident token.
 func lookup(ident string) *Token {
 	switch ident {
 	case "true":
