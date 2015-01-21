@@ -4,6 +4,7 @@ import (
 	"log"
 )
 
+// Binary operator constants.
 type BinType int
 
 const (
@@ -24,56 +25,13 @@ const (
 	Or
 )
 
-func (b BinType) String() string {
-	switch b {
-	case Add:
-		return "+"
-	case Sub:
-		return "-"
-	case Mul:
-		return "*"
-	case Div:
-		return "/"
-	case Mod:
-		return "%"
-	case GreatThan:
-		return ">"
-	case LessThan:
-		return "<"
-	case GreatThanEq:
-		return ">="
-	case LessThanEq:
-		return "<="
-	case EqEq:
-		return "=="
-	case NotEq:
-		return "!="
-	case And:
-		return "&&"
-	case Or:
-		return "||"
-	default:
-		return "error"
-	}
-}
-
+// Unary operator constants.
 type UnaType int
 
 const (
 	Not UnaType = iota
 	Neg
 )
-
-func (u UnaType) String() string {
-	switch u {
-	case Not:
-		return "!"
-	case Neg:
-		return "-"
-	default:
-		return "error"
-	}
-}
 
 type Exp interface {
 	Eval(map[string]interface{}) interface{}
@@ -270,3 +228,49 @@ func (e VarExp) Eval(data map[string]interface{}) interface{} {
 func (e FuncExp) Eval() interface{} {
 	return nil
 }*/
+
+// BinType prints to these values.
+func (b BinType) String() string {
+	switch b {
+	case Add:
+		return "+"
+	case Sub:
+		return "-"
+	case Mul:
+		return "*"
+	case Div:
+		return "/"
+	case Mod:
+		return "%"
+	case GreatThan:
+		return ">"
+	case LessThan:
+		return "<"
+	case GreatThanEq:
+		return ">="
+	case LessThanEq:
+		return "<="
+	case EqEq:
+		return "=="
+	case NotEq:
+		return "!="
+	case And:
+		return "&&"
+	case Or:
+		return "||"
+	default:
+		return "error"
+	}
+}
+
+// UnaType prints to these values.
+func (u UnaType) String() string {
+	switch u {
+	case Not:
+		return "!"
+	case Neg:
+		return "-"
+	default:
+		return "error"
+	}
+}
