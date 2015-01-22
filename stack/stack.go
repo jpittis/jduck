@@ -19,7 +19,7 @@ func New() *Stack {
 // Value in the stack. Stored as linked list.
 type Entity struct {
 	value map[string]interface{} // interface value for storing anything
-	next  *Entity                // the Entity below current
+	Next  *Entity                // the Entity below current
 }
 
 // Entity returns a pointer to top Entity.
@@ -30,10 +30,10 @@ func (s *Stack) Entity() *Entity {
 
 // Push adds a value to the top of the stack.
 func (s *Stack) Push(value map[string]interface{}) {
-	newTop := &Entity{value: value, next: nil}
+	newTop := &Entity{value: value, Next: nil}
 
 	if s.size != 0 {
-		newTop.next = s.top
+		newTop.Next = s.top
 	}
 	s.top = newTop
 	s.size++
@@ -46,7 +46,7 @@ func (s *Stack) Pop() (map[string]interface{}, error) {
 		return nil, errors.New("stack is empty")
 	}
 	result := s.top.value
-	s.top = s.top.next
+	s.top = s.top.Next
 	s.size--
 	return result, nil
 }
