@@ -35,29 +35,39 @@ func (c *Context) Pop() error {
 // Let sets variable in current context.
 func (c *Context) Let(key string, value interface{}) error {
 	scope := c.scope.Peek()
-	_, prs := m[key]
+	_, prs := scope[key]
 	if prs {
 		return errors.New("variable already set")
 	}
-	m[key] = value
+	scope[key] = value
 	return nil
 }
 
 // Set sets already set variable in first context found.
 func (c *Context) Set(key string, value interface{}) error {
-	top, err := c.scope.Entity()
-	for err == nil {
-		_, prs := m[key]
+	scope := c.scope.Entity()
+	for scope != nil {
+		_, prs := scope[key]
 		if prs {
-			m[key] = value
+			scope[key] = value
 			return nil
 		}
-
+		scope = scope.Next
 	}
+	return errors.New("variable not initialized")
 }
 
 // Get returns variable highest on the stack.
 func (c *Context) Get() interface{} {
+	scope := c.scope.Entity()
+	for scope != nil {
+		value, prs := scope[key]
+		if prs {
+			return value
+		}
+		scope = scope.Next
+	}
+	return errors.New("variable not set")
 
 }
 
