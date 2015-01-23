@@ -5,6 +5,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"log"
 	"strconv"
 )
 
@@ -24,6 +25,8 @@ const (
 	End
 
 	Print
+
+	Let
 
 	Ident
 
@@ -71,29 +74,26 @@ func New(reader io.Reader) *Lexer {
 }
 
 // Peek returns the last read token.
-func (l *Lexer) Peek() (*Token, error) {
+func (l *Lexer) Peek() *Token {
 	if l.token == nil {
 		t, err := l.lex()
 		if err != nil {
-			return nil, err
+			log.Fatal(err)
 		}
 		l.token = t
 	}
-	return l.token, nil
+	return l.token
 }
 
 // Eat returns the last read token while reading another.
-func (l *Lexer) Eat() (*Token, error) {
-	temp, err := l.Peek()
-	if err != nil {
-		return nil, err
-	}
+func (l *Lexer) Eat() *Token {
+	temp := l.Peek()
 	t, err := l.lex()
 	if err != nil {
-		return nil, err
+		log.Fatal(err)
 	}
 	l.token = t
-	return temp, nil
+	return temp
 }
 
 // Reads one rune from the file.
@@ -184,26 +184,26 @@ func (l *Lexer) lex() (*Token, error) {
 		return &Token{T: String, Value: runes}, nil
 	case isNumber(r):
 		var runes string
-		r, err := l.read()
+		var err error
 		for isNumber(r) {
+			runes += string(r)
+			r, err = l.read()
 			if err != nil {
 				return nil, err
 			}
-			runes += string(r)
-			r, err = l.read()
 		}
 		l.unread()
 		i, err := strconv.Atoi(runes)
 		return &Token{T: Integer, Value: i}, err
 	case isLetter(r):
 		var runes string
-		r, err := l.read()
+		var err error
 		for isLetter(r) {
+			runes += string(r)
+			r, err = l.read()
 			if err != nil {
 				return nil, err
 			}
-			runes += string(r)
-			r, err = l.read()
 		}
 		l.unread()
 		return lookup(runes), nil // return either ident or keyword token
@@ -275,6 +275,8 @@ func lookup(ident string) *Token {
 		return &Token{T: End}
 	case "print":
 		return &Token{T: Print}
+	case "let":
+		return &Token{T: Let}
 	case "func":
 		return &Token{T: Func}
 	default:

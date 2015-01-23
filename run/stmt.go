@@ -2,10 +2,23 @@ package run
 
 import (
 	"fmt"
+	"log"
 )
 
 type Stmt interface {
-	Exec(map[string]interface{})
+	Exec(*Context)
+}
+
+type LetStmt struct {
+	Name   string
+	Equals Exp
+}
+
+func (s LetStmt) Exec(c *Context) {
+	err := c.Let(s.Name, s.Equals.Eval(c))
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 type VarStmt struct {
@@ -13,16 +26,19 @@ type VarStmt struct {
 	Equals Exp
 }
 
-func (s VarStmt) Exec(data map[string]interface{}) {
-	data[s.Name] = s.Equals.Eval(data)
+func (s VarStmt) Exec(c *Context) {
+	err := c.Set(s.Name, s.Equals.Eval(c))
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 type PrintStmt struct {
 	Print Exp
 }
 
-func (s PrintStmt) Exec(data map[string]interface{}) {
-	fmt.Println(s.Print.Eval(data))
+func (s PrintStmt) Exec(c *Context) {
+	fmt.Println(s.Print.Eval(c))
 }
 
 type IfStmt struct {
@@ -31,16 +47,20 @@ type IfStmt struct {
 	Else []Stmt
 }
 
-func (s IfStmt) Exec(data map[string]interface{}) {
-	b := s.If.Eval(data)
+func (s IfStmt) Exec(c *Context) {
+	b := s.If.Eval(c)
 	if b.(bool) {
-		Run_all(s.Then, data)
+		c.Push()
+		Run_all(s.Then, c)
+		c.Pop()
 	} else if s.Else != nil {
-		Run_all(s.Else, data)
+		c.Push()
+		Run_all(s.Else, c)
+		c.Pop()
 	}
 }
 
-type ForStmt struct {
+/*type ForStmt struct {
 	Init   Stmt
 	Bool   Exp
 	Change Stmt
@@ -55,18 +75,20 @@ func (s ForStmt) Exec(data map[string]interface{}) {
 		s.Change.Exec(data)
 		b = s.Bool.Eval(data)
 	}
-}
+}*/
 
 type WhileStmt struct {
 	Bool Exp
 	Body []Stmt
 }
 
-func (s WhileStmt) Exec(data map[string]interface{}) {
-	b := s.Bool.Eval(data)
+func (s WhileStmt) Exec(c *Context) {
+	b := s.Bool.Eval(c)
 	for b.(bool) {
-		Run_all(s.Body, data)
-		b = s.Bool.Eval(data)
+		c.Push()
+		Run_all(s.Body, c)
+		b = s.Bool.Eval(c)
+		c.Pop()
 	}
 }
 

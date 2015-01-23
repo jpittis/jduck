@@ -18,7 +18,7 @@ func New() *Stack {
 
 // Value in the stack. Stored as linked list.
 type Entity struct {
-	value map[string]interface{} // interface value for storing anything
+	Value map[string]interface{} // interface Value for storing anything
 	Next  *Entity                // the Entity below current
 }
 
@@ -28,9 +28,9 @@ func (s *Stack) Entity() *Entity {
 	return s.top
 }
 
-// Push adds a value to the top of the stack.
-func (s *Stack) Push(value map[string]interface{}) {
-	newTop := &Entity{value: value, Next: nil}
+// Push adds a Value to the top of the stack.
+func (s *Stack) Push(Value map[string]interface{}) {
+	newTop := &Entity{Value: Value, Next: nil}
 
 	if s.size != 0 {
 		newTop.Next = s.top
@@ -40,26 +40,26 @@ func (s *Stack) Push(value map[string]interface{}) {
 	return
 }
 
-// Pop removes a value from the top of the stack. Returns error if empty.
+// Pop removes a Value from the top of the stack. Returns error if empty.
 func (s *Stack) Pop() (map[string]interface{}, error) {
 	if s.size == 0 {
 		return nil, errors.New("stack is empty")
 	}
-	result := s.top.value
+	result := s.top.Value
 	s.top = s.top.Next
 	s.size--
 	return result, nil
 }
 
-// Peek returns the top value of the stack. Returns error if empty.
+// Peek returns the top Value of the stack. Returns error if empty.
 func (s *Stack) Peek() (map[string]interface{}, error) {
 	if s.size == 0 {
 		return nil, errors.New("stack is empty")
 	}
-	return s.top.value, nil
+	return s.top.Value, nil
 }
 
-// Size returns the number of values in the stack.
+// Size returns the number of Values in the stack.
 func (s *Stack) Size() int {
 	return s.size
 }

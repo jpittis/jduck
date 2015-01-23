@@ -34,14 +34,14 @@ const (
 )
 
 type Exp interface {
-	Eval(map[string]interface{}) interface{}
+	Eval(*Context) interface{}
 }
 
 type LitExp struct {
 	Value interface{}
 }
 
-func (e LitExp) Eval(map[string]interface{}) interface{} {
+func (e LitExp) Eval(c *Context) interface{} {
 	return e.Value
 }
 
@@ -51,9 +51,9 @@ type BinExp struct {
 	Right Exp
 }
 
-func (e BinExp) Eval(data map[string]interface{}) interface{} {
-	lhs := e.Left.Eval(data)
-	rhs := e.Right.Eval(data)
+func (e BinExp) Eval(c *Context) interface{} {
+	lhs := e.Left.Eval(c)
+	rhs := e.Right.Eval(c)
 	switch e.Op {
 	case Add:
 		switch lhs.(type) {
@@ -182,8 +182,8 @@ type UnaExp struct {
 	Right Exp
 }
 
-func (e UnaExp) Eval(data map[string]interface{}) interface{} {
-	rhs := e.Right.Eval(data)
+func (e UnaExp) Eval(c *Context) interface{} {
+	rhs := e.Right.Eval(c)
 	switch e.Op {
 	case Not:
 		switch rhs.(type) {
@@ -212,9 +212,9 @@ type VarExp struct {
 	Name string
 }
 
-func (e VarExp) Eval(data map[string]interface{}) interface{} {
-	val, pres := data[e.Name]
-	if !pres {
+func (e VarExp) Eval(c *Context) interface{} {
+	val, err := c.Get(e.Name)
+	if err != nil {
 		log.Fatal("variable not declared")
 	}
 	return val

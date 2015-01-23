@@ -4,12 +4,21 @@ import (
 	"fmt"
 	"github.com/jpittis/jduck/lex"
 	"github.com/jpittis/jduck/run"
+	"log"
 )
 
 func Parse(st *lex.Lexer) []run.Stmt {
 	s := make([]run.Stmt, 0)
 	for st.Peek().T != lex.EOF {
 		switch st.Peek().T {
+		case lex.Let:
+			st.Eat()
+			tok := st.Eat()
+			if st.Peek().T != lex.Eq {
+				fmt.Println("equals not found after name")
+			}
+			st.Eat()
+			s = append(s, parse_let(st, tok.Value.(string)))
 		case lex.Ident:
 			tok := st.Eat()
 			if st.Peek().T != lex.Eq {
@@ -35,18 +44,16 @@ func Parse(st *lex.Lexer) []run.Stmt {
 		case lex.Else:
 			return s
 		default:
-			fmt.Printf("statement type not found %s\n", st.Peek().T)
+			log.Fatal("statement type not found")
 		}
 	}
 	return s
 }
 
 func parse_if(st *lex.Lexer) run.Stmt {
-	fmt.Println(st.Peek().T)
 	b := parse_exp(st)
 	body := parse_body(st)
 	var rest []run.Stmt
-	fmt.Println(st.Peek().T)
 	if st.Peek().T == lex.Else {
 		st.Eat()
 		rest = parse_body(st)
@@ -66,6 +73,11 @@ func parse_while(st *lex.Lexer) run.Stmt {
 
 func parse_body(st *lex.Lexer) []run.Stmt {
 	return Parse(st)
+}
+
+func parse_let(st *lex.Lexer, name string) run.Stmt {
+	e := parse_exp(st)
+	return run.Stmt(run.LetStmt{Name: name, Equals: e})
 }
 
 func parse_ident(st *lex.Lexer, name string) run.Stmt {

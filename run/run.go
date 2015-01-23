@@ -2,6 +2,7 @@
 package run
 
 import (
+	"errors"
 	"github.com/jpittis/jduck/stack"
 )
 
@@ -34,7 +35,10 @@ func (c *Context) Pop() error {
 
 // Let sets variable in current context.
 func (c *Context) Let(key string, value interface{}) error {
-	scope := c.scope.Peek()
+	scope, err := c.scope.Peek()
+	if err != nil {
+		return err
+	}
 	_, prs := scope[key]
 	if prs {
 		return errors.New("variable already set")
@@ -47,9 +51,9 @@ func (c *Context) Let(key string, value interface{}) error {
 func (c *Context) Set(key string, value interface{}) error {
 	scope := c.scope.Entity()
 	for scope != nil {
-		_, prs := scope[key]
+		_, prs := scope.Value[key]
 		if prs {
-			scope[key] = value
+			scope.Value[key] = value
 			return nil
 		}
 		scope = scope.Next
@@ -58,30 +62,30 @@ func (c *Context) Set(key string, value interface{}) error {
 }
 
 // Get returns variable highest on the stack.
-func (c *Context) Get() interface{} {
+func (c *Context) Get(key string) (interface{}, error) {
 	scope := c.scope.Entity()
 	for scope != nil {
-		value, prs := scope[key]
+		value, prs := scope.Value[key]
 		if prs {
-			return value
+			return value, nil
 		}
 		scope = scope.Next
 	}
-	return errors.New("variable not set")
+	return nil, errors.New("variable not set")
 
 }
 
 func Run(ast []Stmt) {
-	data := make(map[string]interface{})
-	Run_all(ast, data)
+	c := NewContext()
+	Run_all(ast, c)
 }
 
-func Run_all(s []Stmt, data map[string]interface{}) {
+func Run_all(s []Stmt, c *Context) {
 	for _, s := range s {
-		run_stmt(s, data)
+		run_stmt(s, c)
 	}
 }
 
-func run_stmt(s Stmt, data map[string]interface{}) {
-	s.Exec(data)
+func run_stmt(s Stmt, c *Context) {
+	s.Exec(c)
 }
