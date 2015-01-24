@@ -11,6 +11,13 @@ func Parse(st *lex.Lexer) []run.Stmt {
 	s := make([]run.Stmt, 0)
 	for st.Peek().T != lex.EOF {
 		switch st.Peek().T {
+		case lex.Fun:
+			st.Eat()
+			if st.Peek().T != lex.Ident {
+				log.Fatal("no ident after func keyword")
+			}
+			tok := st.Eat()
+			s = append(s, parse_params(st, tok.Value.(string)))
 		case lex.Let:
 			st.Eat()
 			tok := st.Eat()

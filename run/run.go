@@ -8,13 +8,15 @@ import (
 
 type Context struct {
 	scope *stack.Stack
+	fun   map[string]FuncStmt
 }
 
 func NewContext() *Context {
 	s := stack.New()
 	global := make(map[string]interface{})
 	s.Push(global)
-	return &Context{scope: s}
+	f := make(map[string]FuncStmt)
+	return &Context{scope: s, fun: f}
 }
 
 // Push adds a new scope to the context.

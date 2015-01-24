@@ -92,11 +92,19 @@ func (s WhileStmt) Exec(c *Context) {
 	}
 }
 
-/*type FuncStmt struct {
+type FuncStmt struct {
+	Params []string
 	Body   []Stmt
 }
 
-func (s WhileStmt) Exec(data map[string]interface{}) {
+func (s FuncStmt) Exec(c *Context) {
+	Run_all(s.Body, c)
+}
+
+type ReturnStmt struct {
+	Return Exp
+}
+
+func (s ReturnStmt) Exec(c *Context) {
 
 }
-*/
